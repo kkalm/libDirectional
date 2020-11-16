@@ -38,7 +38,20 @@ classdef HypertoroidalParticleFilter < AbstractHypertoroidalFilter
             % Parameters:
             %   noiseDistribution (AbstractHypertoroidalDistribution)
             %       distribution of additive noise
-            this.predictNonlinear(@(x) x, noiseDistribution);
+
+            % ORIGINAL:
+            % this.predictNonlinear(@(x) x, noiseDistribution);
+            
+            % SPEEDY
+            wdF = this.wd;
+            if isa (noiseDistribution, 'AbstractHypertoroidalDistribution')
+                n = length(this.wd.d);
+                noise = noiseDistribution.sample(n);
+            else
+                noise = noiseDistribution;
+            end
+            wdF.d = mod(wdF.d + noise, 2*pi);
+            this.wd = wdF;
         end
         
         function predictNonlinear(this, f, noiseDistribution)

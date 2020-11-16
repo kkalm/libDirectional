@@ -12,7 +12,10 @@ classdef CircularParticleFilter < AbstractCircularFilter & HypertoroidalParticle
             %
             % Parameters:
             %   nParticles (integer > 0)
-            %       number of particles to use         
+            %       number of particles to use
+            if nargin < 1
+                nParticles = 10^3;
+            end     
             assert(isscalar(nParticles));
             assert(nParticles >= 1);
             this@HypertoroidalParticleFilter(nParticles, 1);
@@ -137,6 +140,34 @@ classdef CircularParticleFilter < AbstractCircularFilter & HypertoroidalParticle
             end
             this.wd = WDDistribution(this.wd.sample(length(this.wd.d))); %use SIR.
         end
+
+        function updateMixture(this, WD, beta)
+            % Creates a mixture of current and a specified WD
+            % as determined by mix coeff beta:
+            % this = beta*this + (1-beta)*WD
+            %
+            % Parameters:
+            %   WD (WDDistribution)
+            %       target mixing WD distribution
+            %   beta (scalar) 
+            %       mixing coefficient
+            if nargin < 3
+                beta = 1; % resample all, equivalent to SIR
+            end
+            assert (isa (WD, 'WDDistribution'));
+            assert(isscalar(beta));
+            
+            numSamples = length(this.wd.d);
+            numThis = round(numSamples * beta);
+            numPrev = numSamples - numThis;
+            
+            thisSamples = this.wd.sample(numThis);
+            prevSamples = WD.sample(numPrev);
+            d = [thisSamples prevSamples];
+            this.wd = WDDistribution(d); % replace samples and add weights
+            
+            %this.wd.plot;
+        end
         
         function likelihoodVal=associationLikelihood(this,likelihood)
             % see Florian Pfaff, Kailai Li, and Uwe D. Hanebeck,
@@ -145,6 +176,14 @@ classdef CircularParticleFilter < AbstractCircularFilter & HypertoroidalParticle
             % Multisensor Fusion and Integration for Intelligent Systems (MFI 2019),
             % Taipei, Republic of China, May, 2019.
             likelihoodVal = sum(likelihood.pdf(this.getEstimate.d).*this.getEstimate.w);
+        end
+
+        function wd = Recall(this, noiseDistribution, z)
+            likelihood = LikelihoodFactory.additiveNoiseLikelihood(@(x) x, noiseDistribution);
+            wd = this.wd.reweigh(@(x) likelihood(z, x));
+            % resample after reweighting
+            wd.d = wd.sample(length(this.wd.d));
+            wd.w = 1/size(this.wd.d,2)*ones(1,size(this.wd.d,2));
         end
     end
     

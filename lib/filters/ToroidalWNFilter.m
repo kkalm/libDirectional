@@ -167,6 +167,16 @@ classdef ToroidalWNFilter < AbstractToroidalFilter
             end
         end
 
+        function twn = Recall(this, noiseDistribution, z)
+            twn = this.twn;
+            wn = twn.marginalizeTo1D(2);
+            muWnew = mod(z - noiseDistribution.mu, 2*pi);
+            wnRecallShifted = WNDistribution(muWnew, noiseDistribution.sigma);
+            wn = wn.multiplyVM(wnRecallShifted);
+            twn.mu(2) = wn.mu;
+            twn.C(2,2) = wn.sigma .^ 2;
+        end
+
         function twn = getEstimate(this)
             % Return current estimate 
             %
