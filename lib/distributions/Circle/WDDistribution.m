@@ -311,8 +311,35 @@ classdef WDDistribution < AbstractCircularDistribution & HypertoroidalWDDistribu
             %       plot handles for plot3 and stem3
             h = stem3(cos(this.d), sin(this.d), this.w, varargin{:});
         end
+
+        function h = ploth(this, nbins, varargin)
+            if size(this.d,1) == 1 % if 1D
+                if nargin < 2
+                    nbins = 60;
+                end
+                % histogram of dirac components
+                bins = linspace(0, 2*pi, nbins);
+                H = histc(this.d, bins);
+                H = mat2gray(H);
+                h = bar(bins, H, varargin{:});
+                BarCol = get(h, 'FaceColor');
+                if ischar(BarCol)
+                    BarCol = [0 0 1];
+                end
+                BarCol = BarCol./max(BarCol);
+                BarCol(BarCol ~= 1) = 0.75;
+                set(h, 'FaceColor', BarCol, 'BarWidth', 1, 'EdgeColor', 'none');
+                h.BaseLine.Visible = 'off';
+                hc = get(h,'Children');
+                set(hc,'FaceAlpha', 0.8);
+                set(gca, 'XLim', [0 2*pi]);
+            else
+                disp('Supports 1D data only')
+            end
+        end
+
         
-        function s = sample(this, n)
+        function [s, ids] = sample(this, n)
             % Obtain n samples from the distribution
             %
             % Parameters:
@@ -321,8 +348,12 @@ classdef WDDistribution < AbstractCircularDistribution & HypertoroidalWDDistribu
             % Returns:
             %   s (1 x n)
             %       n samples on the circle
-            ids = discretesample(this.w,n);
-            s = this.d(ids);
+            if n > 0
+                ids = discretesample(this.w,n); % id-s of dirac components (samples/particles)
+                s = this.d(ids);
+            else
+                s = [];
+            end
         end
         
         function sampleCdf(~, ~)
@@ -358,6 +389,12 @@ classdef WDDistribution < AbstractCircularDistribution & HypertoroidalWDDistribu
             warning('entropy is not defined in a continous sense')
             result = 0;
         end
+
+        function n = eff(this)
+            % effective sample size
+            n = 1 / (sum(this.w.^2));
+        end
+
     end   
 end
 

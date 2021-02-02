@@ -7,6 +7,7 @@ classdef VMDistribution < AbstractCircularDistribution
     properties
         mu (1,1) double {mustBeReal,mustBeFinite,mustBeNonNan}
         kappa (1,1) double {mustBeNonnegative}
+        std (1,1) double {mustBeNonnegative}
     end
     
     methods
@@ -14,6 +15,7 @@ classdef VMDistribution < AbstractCircularDistribution
             % Constructor
             this.mu = mod(mu_,2*pi);
             this.kappa = kappa_;
+            this.std = this.circularStd;
         end
         
         function r = cdf(this, xa, startingPoint)
