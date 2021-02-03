@@ -9,7 +9,7 @@ classdef (Abstract) AbstractToroidalDistribution < AbstractHypertoroidalDistribu
     
     methods
         function this=AbstractToroidalDistribution
-            this.dim=2;
+            this.dim = 2;
         end
         
         function p = plotCylinder(this, varargin)

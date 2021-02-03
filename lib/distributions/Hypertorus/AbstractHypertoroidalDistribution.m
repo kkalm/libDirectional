@@ -15,27 +15,28 @@ classdef (Abstract) AbstractHypertoroidalDistribution < AbstractDistribution
             %       plot handle
             switch this.dim
                 case 1
-                    theta = linspace(0,2*pi,128);
+                    theta = linspace(0, 2*pi, 128);
                     ftheta = this.pdf(theta);
-                    p = plot(theta, ftheta,varargin{:});
+                    p = plot(theta, ftheta, varargin{:});
                 case 2
                     step = 2*pi/100;
                     [alpha,beta] = meshgrid(0:step:2*pi,0:step:2*pi);
                     f = this.pdf([alpha(:)'; beta(:)']);
                     f = reshape(f,size(alpha,1), size(alpha,2));
-                    p = surf(alpha, beta, f, varargin{:});
+                    p = imagesc(f, varargin{:}); % 2D
+                    % p = surf(alpha, beta, f, varargin{:}); % 3D
                 case 3
                     stepCirc = 0.5;
                     [X,Y,Z] = sphere(4);
                     clf 
                     hold on
                     color = jet;
-                    [gridx,gridy,gridz]=ndgrid(0:stepCirc:2*pi);
+                    [gridx, gridy, gridz] = ndgrid(0:stepCirc:2*pi);
                     fgrid=reshape(this.pdf([gridx(:)';gridy(:)';gridz(:)']),size(gridx));
                     fmax=max(fgrid(:));
                     sizes=0.5*stepCirc*fgrid/fmax;
                     arrayfun(@(x,y,z,currSize) surf(currSize*X+x,currSize*Y+y,currSize*Z+z, 'facecolor', color(1+floor(currSize*126/stepCirc),:)),...
-                        gridx(sizes>0.01),gridy(sizes>0.01),gridz(sizes>0.01),sizes(sizes>0.01)); % Only use grid points for which size>0.01
+                        gridx(sizes>0.01), gridy(sizes>0.01) ,gridz(sizes>0.01),sizes(sizes>0.01)); % Only use grid points for which size>0.01
                     hold off
                     xlabel('x_1')
                     setupAxisCircular('x','y','z')
@@ -46,6 +47,23 @@ classdef (Abstract) AbstractHypertoroidalDistribution < AbstractDistribution
                 otherwise
                     error('Plotting for this dimension is currently not supported');
             end
+        end
+        
+        function p = plot_contours(this, num_lines)
+            if nargin < 2
+                num_lines = 15;
+            end
+            switch this.dim
+                case 2
+                    step = 2*pi/100;
+                    [alpha,beta] = meshgrid(0:step:2*pi,0:step:2*pi);
+                    f = this.pdf([alpha(:)'; beta(:)']);
+                    f = reshape(f,size(alpha,1), size(alpha,2));
+                    [~, p] = contour(alpha, beta, f, num_lines);
+                otherwise
+                    error('Plotting for this dimension is currently not supported');
+            end            
+            
         end
         
         function m = circularMean(this)
