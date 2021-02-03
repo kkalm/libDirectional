@@ -77,6 +77,26 @@ classdef ToroidalWDDistribution < AbstractToroidalDistribution & HypertoroidalWD
                 result =  sum(this.w(this.d(1,:)>=l(1) & this.d(1,:)<r(1) & this.d(2,:)>=l(2) & this.d(2,:)<r(2) ));
             end
         end
+
+
+        function p = plotScatter(this, color_map)
+            if nargin < 2
+                %color_map = linspace(0.9, 0.1, 10^2);
+                %color_map = color_map(ones(3,1), :)';
+                color_map = colormap('winter');
+                %color_map = brewermap(64, 'Spectral');
+            end
+            switch this.dim
+                case 2
+                    colormap(color_map);
+                    p = scatter(this.d(1,:), this.d(2,:), 35, this.w, 'filled');
+                    p.MarkerFaceAlpha = 0.15;
+                    set(gca, 'YLim', [0, 2*pi], 'XLim', [0, 2*pi]);
+                otherwise
+                    error('Plotting for this dimension is currently not supported');
+            end
+        end 
+
                 
         function p = plotCylinder(this, varargin)
             % Create a cylinder plot 
@@ -91,6 +111,7 @@ classdef ToroidalWDDistribution < AbstractToroidalDistribution & HypertoroidalWD
             scale = 0;
             p = scatter3(this.d(1,:), (offset+scale*this.w).*cos(this.d(2,:)), (offset+scale*this.w).*sin(this.d(2,:)), varargin{:});
         end
+
         
         function p = plotTorus(this, varargin)
             % Create a torus plot 
@@ -436,6 +457,35 @@ classdef ToroidalWDDistribution < AbstractToroidalDistribution & HypertoroidalWD
             n = length(this.d);
             C = (dbar-repmat(mu,n,1))'*diag(this.w)*(dbar-repmat(mu,n,1));
         end
+
+        function [wd, wd_] = cpdf(this, cDistribution, cdim)
+            % conditional probability
+            % p(x|y)
+            % only works if this WD is used as a joint probability dist
+            % so needs dim > 1
+            %   cdim            which dimension is conditioned:
+            %                   i.e. which is y in p(x|y)
+            %                   default cdim = 2
+            %   cDistribution   distribution of y
+            %                   has to be dim = 1
+            
+            if nargin < 3,  cdim = 2;  end
+            if nargin < 2,  error('Need condition'); end
+            
+            % check is condition is 1D and circular
+            assert (isa (cDistribution, 'AbstractCircularDistribution'));
+            assert (cDistribution.dim == 1, 'cDistribution is not 1D');
+            
+            wd = this;
+            wd_2 = wd.marginalizeTo1D(cdim);
+            wd_2 = wd_2.reweigh(@cDistribution.pdf);
+            % figure(3); M.plot;
+            wd.w = wd_2.w;
+            % resample after reweighting
+            wd_.d = wd.sample(length(this.d));
+            wd_.w = 1/size(this.d,2)*ones(1,size(this.d,2));
+        end
+
     end
     
 end
