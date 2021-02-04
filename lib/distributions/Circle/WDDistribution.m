@@ -98,8 +98,7 @@ classdef WDDistribution < AbstractCircularDistribution & HypertoroidalWDDistribu
             dplus = max(cumsum(wsorted) - z);
             dminus = max(z - [0, cumsum(wsorted(1:end-1))]);
             v = dplus + dminus;
-        end
-                        
+        end 
         
         function pwc = toPWC(this, n)
             % Approximate the WD distribution using a piecewise constant

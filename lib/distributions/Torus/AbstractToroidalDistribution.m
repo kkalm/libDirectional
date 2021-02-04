@@ -50,6 +50,17 @@ classdef (Abstract) AbstractToroidalDistribution < AbstractHypertoroidalDistribu
             Y = (a+(b+f*scale).*cos(alpha)).*sin(beta);
             Z = (b+f*scale).*sin(alpha);
             p = surf(X,Y,Z,f, varargin{:});
+
+            p.FaceAlpha = 0.6;
+            p.EdgeColor = 'none';
+            
+            set(gca, 'XLim', [0 2*pi]);
+            set(gca, 'YLim', [0 2*pi]);
+            
+            %View the object from directly overhead.
+            az = 0;
+            el = 90;
+            view(az, el); 
         end
         
         function pm = angularProductMomentNumerical(this, n)

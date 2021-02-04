@@ -32,6 +32,42 @@ classdef GaussianDistribution
             
             this.C = C_;
         end
+
+        function gauss = multiply(this, g2)
+            % Multiply two Gaussians
+            %
+            % Parameters:
+            %   g2 (GaussianDistribution)
+            %       distribution to multiply with
+            % Returns:
+            %   gauss (GaussianDistribution)
+            %       product of this and g2
+            
+            assert(isa(g2,'GaussianDistribution'));
+            % product of two gaussians
+            C_ = (this.C * g2.C) / (this.C + g2.C);
+            mu_ = ((this.mu .* g2.C) + (g2.mu .* this.C)) / (this.C + g2.C); 
+            gauss = GaussianDistribution(mu_, C_);
+        end 
+
+        function p = plot(this, varargin)
+            % Create an appropriate plot of the pdf
+            %
+            % Parameters:
+            %   varargin
+            %       parameters to be passed to plot/surf command
+            % Returns:
+            %   p (scalar)
+            %       plot handle
+
+            theta = linspace(0, 2*pi, 128);
+            ftheta = this.pdf(theta);
+            p = plot(theta, ftheta, varargin{:});
+  
+            set(gca, 'XLim', [0 2*pi]);
+            %set(gca,'visible','off');
+            
+        end   
         
         function p = pdf(this, xa)
             % Evaluate pdf at each column of xa

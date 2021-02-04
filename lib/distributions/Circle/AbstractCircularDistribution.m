@@ -97,6 +97,34 @@ classdef (Abstract) AbstractCircularDistribution < AbstractHypertoroidalDistribu
             scale = 1/max(ftheta);
             p = plot((1+scale*ftheta).*cos(theta),(1+scale*ftheta).*sin(theta),varargin{:});
         end
+
+        function p = plot2dcirc(this, scale, varargin)
+            % Create a circular 2D plot of the pdf
+            %
+            % Parameters:
+            %   varargin
+            %       parameters to be passed to plot command
+            % Returns:
+            %   p (scalar)
+            %       plot handle
+            if nargin < 2, scale = 1; end
+            assert(isscalar(scale));
+                        
+            std = linspace(this.mu-this.std, this.mu+this.std, 100);
+            p = plot(cos(std) .* scale, sin(std) .* scale, varargin{:}); hold on;
+            colour = get(p, 'Color');            
+            % point
+            scatter(cos(this.mu), sin(this.mu), 25, colour, 'filled');
+            % text
+            textscale = scale * 0.8;
+            text(cos(this.mu) .* textscale, sin(this.mu) .* textscale, num2str(round(this.mu,3)), ... 
+                'Color', colour, 'FontSize', 8);
+            set(gca, 'XLim', [-1.1 1.1]);
+            set(gca, 'YLim', [-1.1 1.1]);
+            set(gca, 'FontSize', 8);
+            set(gca, 'Visible', 'off');
+        end
+
         
         function p = plot3d(this, varargin)
             % Create a 3D plot of the pdf
@@ -131,6 +159,19 @@ classdef (Abstract) AbstractCircularDistribution < AbstractHypertoroidalDistribu
             %       circular variance in [0, 1]
             a = this.trigonometricMoment(1);
             v = 1 - abs(a);
+        end
+
+        function std = circularStd(this)
+            % Calculate the circular variance
+            %
+            % Returns:
+            %   v (scalar)
+            %       circular std in [0, 1]
+            % a -- resultant vector 
+            % abs(a) -- resultant vector length
+            a = this.trigonometricMoment(1);
+            % 
+            std = sqrt(2.*(1 - abs(a)));
         end
         
         function wd = toDirac2(this)

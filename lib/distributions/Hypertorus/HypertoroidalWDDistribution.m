@@ -114,8 +114,14 @@ classdef HypertoroidalWDDistribution < AbstractHypertoroidalDistribution
             
             wNew = f(this.d);
             assert(all(wNew >= 0));
-            assert(sum(wNew) > 0);
-            
+
+            try
+                assert(sum(wNew) > 0);
+            catch
+                warning('Assert failed, check this code!')
+                wNew = ones(1,length(wNew)) ./ length(wNew);
+            end
+         
             hwd=this;
             hwd.w=wNew.*this.w;
             hwd.w=hwd.w/sum(hwd.w);
