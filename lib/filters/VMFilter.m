@@ -46,7 +46,10 @@ classdef VMFilter < AbstractCircularFilter
             %   vmSys (VMDistribution)
             %       distribution of additive noise
             assert(isa(vmSys, 'VMDistribution'));
-            this.vm = this.vm.convolve(vmSys);
+            %this.vm = this.vm.convolve(vmSys);
+            if ~isinf(vmSys.kappa) % if not zero noise model
+                this.vm = this.vm.convolve(vmSys);
+            end
         end
         
         function predictNonlinear(this, f, vmSys) 
@@ -371,6 +374,7 @@ classdef VMFilter < AbstractCircularFilter
                 / (2 * pi * besseli(0, this.getEstimate.kappa)...
                 * besseli(0, likelihood.kappa));
         end
+
     end
     
 end
