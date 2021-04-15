@@ -336,8 +336,7 @@ classdef WDDistribution < AbstractCircularDistribution & HypertoroidalWDDistribu
                 disp('Supports 1D data only')
             end
         end
-
-        
+     
         function [s, ids] = sample(this, n)
             % Obtain n samples from the distribution
             %

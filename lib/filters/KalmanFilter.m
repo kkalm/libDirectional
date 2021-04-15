@@ -95,7 +95,7 @@ classdef KalmanFilter < AbstractFilter
             % mean
             %m = m + K * (y - H*m);
             IM = z - H*this.gauss.mu; % measurement residual
-            mu_ = this.gauss.mu + K*IM; %updated mean
+            mu_ = this.gauss.mu + K*IM; % updated mean
             % cov
             %P = P - K * S * K.';
             C_ = (eye(d,d) - K*H) * this.gauss.C; %updated covariance

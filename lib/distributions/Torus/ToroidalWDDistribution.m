@@ -15,11 +15,21 @@ classdef ToroidalWDDistribution < AbstractToroidalDistribution & HypertoroidalWD
             %       Dirac locations in [0,2pi)^2
             %   w_ (1 x L)
             %       weights for each Dirac  
-            arguments
-                d_ (2,:) double
-                w_ (1,:) double = ones(1,size(d_,2))/size(d_,2);
+            
+%             arguments
+%                 d_ (2,:) double
+%                 w_ (1,:) double = ones(1,size(d_,2))/size(d_,2);
+%             end
+%            this@HypertoroidalWDDistribution(d_, w_);
+
+            % backwards compatibility with MATLAB 2018
+            if nargin<2 
+                args = {d_};
+            else
+                args = {d_, w_};
             end
-            this@HypertoroidalWDDistribution(d_, w_);
+            this@HypertoroidalWDDistribution(args{:});
+            
         end
         
         function angularProductMomentNumerical(~,~)

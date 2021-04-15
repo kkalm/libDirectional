@@ -49,7 +49,7 @@ classdef (Abstract) AbstractHypertoroidalDistribution < AbstractDistribution
             end
         end
         
-        function p = plot_contours(this, num_lines)
+        function p = plot_contours(this, num_lines, varargin)
             if nargin < 2
                 num_lines = 15;
             end
@@ -59,7 +59,7 @@ classdef (Abstract) AbstractHypertoroidalDistribution < AbstractDistribution
                     [alpha,beta] = meshgrid(0:step:2*pi,0:step:2*pi);
                     f = this.pdf([alpha(:)'; beta(:)']);
                     f = reshape(f,size(alpha,1), size(alpha,2));
-                    [~, p] = contour(alpha, beta, f, num_lines);
+                    [~, p] = contour(alpha, beta, f, num_lines, varargin{:});
                 otherwise
                     error('Plotting for this dimension is currently not supported');
             end            

@@ -124,8 +124,7 @@ classdef (Abstract) AbstractCircularDistribution < AbstractHypertoroidalDistribu
             set(gca, 'FontSize', 8);
             set(gca, 'Visible', 'off');
         end
-
-        
+       
         function p = plot3d(this, varargin)
             % Create a 3D plot of the pdf
             %

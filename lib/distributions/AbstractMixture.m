@@ -6,10 +6,10 @@ classdef (Abstract) AbstractMixture < AbstractDistribution
     
     methods
         function this = AbstractMixture(dists, w)
-            arguments
-                dists cell     % Cell array of hypertoroidal distributions
-                w double {mustBeNonnegative}         % Weights
-            end
+%             arguments
+%                 dists cell     % Cell array of hypertoroidal distributions
+%                 w double {mustBeNonnegative}         % Weights
+%             end
             % Constructor
             assert(all(size(dists) == size(w)),'size of dists and w must be equal');
             assert(all(dists{1}.dim==cellfun(@(dist)dist.dim,dists))); % Ensure equal dimensions
